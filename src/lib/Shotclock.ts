@@ -13,7 +13,7 @@ export interface Config {
 export const defaultConfig: Config = {
     shotTime: 30,
     extensionTime: 30,
-    firstShotTime: 60
+    firstShotTime: 60,
 };
 
 export class Shotclock {

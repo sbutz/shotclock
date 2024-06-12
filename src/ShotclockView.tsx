@@ -13,23 +13,43 @@ const timerStyles = {
   lineHeight: 1,
 }
 
+const audio = new Audio(process.env.PUBLIC_URL + "/shotclock.mp3");
+
 export default function ShotclockView() {
   const clock = useState(new Shotclock())[0];
-  const [remainingTime, setRemainingTime] = useState(clock.getRemainingTime());
+  const [remainingTime, setRemainingTime] = useState(Math.round(clock.getRemainingTime()));
   const [isStarted, setIsStarted] = useState(clock.isStarted());
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setRemainingTime(clock.getRemainingTime());
+      setRemainingTime(Math.round(clock.getRemainingTime()));
       setIsStarted(clock.isStarted());
     }, 250);
 
     return () => clearInterval(intervalId);
   }, [clock]);
 
+  useEffect(() => {
+    if (isStarted && remainingTime < 5) {
+      audio.play();
+    }
+  }, [remainingTime, isStarted]);
+
   const toggleClock = () => { clock.isStarted() ? clock.pause() : clock.start() };
   return (
     <Stack height="100vh" alignItems="center" justifyContent="center">
+      <Typography sx={timerStyles}>{remainingTime}</Typography>
+      <Stack direction="row">
+        <IconButton onClick={() => clock.newShot()} size="large">
+          <RestartAltRounded sx={iconStyles}/>
+        </IconButton>
+        <IconButton onClick={toggleClock} size="large">
+          {isStarted ? <PauseCircleFilledRounded sx={iconStyles}/> : <PlayCircleFilledOutlined sx={iconStyles} />}
+        </IconButton>
+        <IconButton onClick={() => clock.newRack()} size="large">
+          <PowerSettingsNewRounded sx={iconStyles}/>
+        </IconButton>
+      </Stack>
       <Stack direction="row" spacing={2}>
         <Button
           onClick={() => clock.useExtension(Player.Home)}
@@ -47,18 +67,6 @@ export default function ShotclockView() {
         >
           Extension (Gast)
         </Button>
-      </Stack>
-      <Typography sx={timerStyles}>{remainingTime.toFixed(0)}</Typography>
-      <Stack direction="row">
-        <IconButton onClick={() => clock.newShot()} size="large">
-          <RestartAltRounded sx={iconStyles}/>
-        </IconButton>
-        <IconButton onClick={toggleClock} size="large">
-          {isStarted ? <PauseCircleFilledRounded sx={iconStyles}/> : <PlayCircleFilledOutlined sx={iconStyles} />}
-        </IconButton>
-        <IconButton onClick={() => clock.newRack()} size="large">
-          <PowerSettingsNewRounded sx={iconStyles}/>
-        </IconButton>
       </Stack>
     </Stack>
   );
