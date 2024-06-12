@@ -1,11 +1,10 @@
-import { Button, IconButton, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { Player, Shotclock } from "./lib/Shotclock";
-import { PauseCircleFilledRounded, PlayCircleFilledOutlined, PowerSettingsNewRounded, RestartAltRounded } from "@mui/icons-material";
+import { Pause, PlayArrow} from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import Grid from '@mui/material/Unstable_Grid2';
 
-const iconStyles = {
-  fontSize: '5rem',
-}
+import Layout from "./Layout";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
@@ -18,56 +17,61 @@ const audio = new Audio(process.env.PUBLIC_URL + "/shotclock.mp3");
 export default function ShotclockView() {
   const clock = useState(new Shotclock())[0];
   const [remainingTime, setRemainingTime] = useState(Math.round(clock.getRemainingTime()));
-  const [isStarted, setIsStarted] = useState(clock.isStarted());
+  const startStopIcon = clock.isStarted() ? <Pause /> : <PlayArrow />;
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setRemainingTime(Math.round(clock.getRemainingTime()));
-      setIsStarted(clock.isStarted());
     }, 250);
 
     return () => clearInterval(intervalId);
   }, [clock]);
 
   useEffect(() => {
-    if (isStarted && remainingTime < 5) {
+    if (clock.isStarted() && remainingTime < 5) {
       audio.play();
     }
-  }, [remainingTime, isStarted]);
+  }, [remainingTime, clock]);
 
   const toggleClock = () => { clock.isStarted() ? clock.pause() : clock.start() };
   return (
-    <Stack height="100vh" alignItems="center" justifyContent="center">
-      <Typography sx={timerStyles}>{remainingTime}</Typography>
-      <Stack direction="row">
-        <IconButton onClick={() => clock.newShot()} size="large">
-          <RestartAltRounded sx={iconStyles}/>
-        </IconButton>
-        <IconButton onClick={toggleClock} size="large">
-          {isStarted ? <PauseCircleFilledRounded sx={iconStyles}/> : <PlayCircleFilledOutlined sx={iconStyles} />}
-        </IconButton>
-        <IconButton onClick={() => clock.newRack()} size="large">
-          <PowerSettingsNewRounded sx={iconStyles}/>
-        </IconButton>
+    <Layout>
+      <Stack height="100%" alignItems="center" justifyContent="center" spacing={2}>
+        <Typography sx={timerStyles}>{remainingTime}</Typography>
+        <Grid container spacing={2}>
+          <Grid xs={12}>
+            <Button variant="contained" startIcon={startStopIcon} onClick={toggleClock} fullWidth>
+              {clock.isStarted() ? "Pause" : "Start"}
+            </Button>
+          </Grid>
+          <Grid xs={6}>
+            <Button variant="contained" onClick={() => clock.newShot()} fullWidth>Neuer Stoß</Button>
+          </Grid>
+          <Grid xs={6}>
+            <Button variant="contained" onClick={() => clock.newRack()} fullWidth>Neues Rack</Button>
+          </Grid>
+          <Grid xs={6}>
+            <Button
+              onClick={() => clock.useExtension(Player.Home)}
+              variant="contained"
+              disabled={!clock.hasExtension(Player.Home)}
+              fullWidth
+            >
+              Extension Heim
+            </Button>
+          </Grid>
+          <Grid xs={6}>
+            <Button
+              onClick={() => clock.useExtension(Player.Guest)}
+              variant="contained"
+              disabled={!clock.hasExtension(Player.Guest)}
+              fullWidth
+            >
+              Extension Gast
+            </Button>
+          </Grid>
+        </Grid>
       </Stack>
-      <Stack direction="row" spacing={2}>
-        <Button
-          onClick={() => clock.useExtension(Player.Home)}
-          variant="contained"
-          color="primary"
-          disabled={!clock.hasExtension(Player.Home)}
-        >
-          Extension (Heim)
-        </Button>
-        <Button
-          onClick={() => clock.useExtension(Player.Guest)}
-          variant="contained"
-          color="error"
-          disabled={!clock.hasExtension(Player.Guest)}
-        >
-          Extension (Gast)
-        </Button>
-      </Stack>
-    </Stack>
+    </Layout>
   );
 }
