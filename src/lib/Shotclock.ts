@@ -5,15 +5,18 @@ export enum Player {
     Home = 'Home'
 }
 
-export interface IShotclock {
+export interface IReadonlyShotclock {
+    isStarted(): boolean;
+    getRemainingTime(): number;
+    hasExtension(player: Player): boolean;
+}
+
+export interface IShotclock extends IReadonlyShotclock {
     newRack(): void;
     newShot(): void;
-    isStarted(): boolean;
     start(): void;
     pause(): void;
-    getRemainingTime(): number;
     setRemainingTime(seconds: number): void;
-    hasExtension(player: Player): boolean;
     useExtension(player: Player): void;
 }
 

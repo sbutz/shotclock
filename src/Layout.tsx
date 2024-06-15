@@ -1,21 +1,21 @@
 import { ReactNode } from "react";
-import { Stack } from "@mui/material";
+import { AppBar, Stack, Toolbar, Typography } from "@mui/material";
 
 interface LayoutProps {
-    children: ReactNode;
+    children?: ReactNode;
+    toolbarItems?: ReactNode
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, toolbarItems }: LayoutProps) {
   return (
     <Stack height="100vh">
-        {/*}
         <AppBar position="sticky" color="transparent" elevation={0}>
-            <Container>
-                <Toolbar>
-                </Toolbar>
-            </Container>
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              </Typography>
+              {toolbarItems}
+            </Toolbar>
         </AppBar>
-        */}
         {children}
     </Stack>
   );

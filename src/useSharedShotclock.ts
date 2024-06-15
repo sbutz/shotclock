@@ -3,7 +3,7 @@ import { db } from "./Firebase";
 import { shotclockConverter } from "./lib/ShotclockConverter";
 import { IShotclock, Shotclock } from "./lib/Shotclock";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function useShardShotclock(id: string) {
     const ref = doc(db, `shotclocks/${id}`).withConverter(shotclockConverter);
@@ -12,22 +12,10 @@ export default function useShardShotclock(id: string) {
     const [remainingTime, setRemainingTime] = useState<number>(0);
     const [isStarted, setIsStarted] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (error) {
-            throw error;
-        } else if (!loading && value) {
-            console.debug(`Loaded shotclock. Id=${id}`, value);
-            setShotclock(value);
-        } else if (!loading && !value) {
-            console.debug(`Created new shotclock. Id=${id}`);
-            setShotclock(new Shotclock());
-        }
-    }, [id, value, loading, error]);
-
-    const updateFirestore = async () => {
+    const updateFirestore = useCallback(async () => {
         console.debug("sync");
         setDoc(ref, shotclock);
-    };
+    }, [shotclock, ref]);
 
     const withUpdateFirestore = (obj: Shotclock, fn: Function) => {
         return (...args: any[]) => {
@@ -36,6 +24,22 @@ export default function useShardShotclock(id: string) {
             return ret;
         }
     };
+
+    useEffect(() => {
+        if (!shotclock) {
+            if (error) {
+                throw error;
+            } else if (!loading && value) {
+                console.debug(`Loaded shotclock. Id=${id}`, value);
+                setShotclock(value);
+            } else if (!loading && !value) {
+                console.debug(`Created new shotclock. Id=${id}`);
+                const sc = new Shotclock();
+                setShotclock(sc);
+                setDoc(ref, sc);
+            }
+        }
+    }, [shotclock, id, value, loading, error, ref]);
 
     useEffect(() => {
         if (shotclock) {

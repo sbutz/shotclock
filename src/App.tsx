@@ -1,6 +1,36 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ShotclockView from './ShotclockView';
+import { customAlphabet } from "nanoid";
+import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import ErrorView from './ErrorView';
+import ShareView from './ShareView';
+import PlayerView from './PlayerView';
+
+const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNPQRSTUVWXYZ", 5);
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to={`/${nanoid()}`} />,
+  },
+  {
+    path: "/:id",
+    element: <ShotclockView />,
+  },
+  {
+    path: "s/:id",
+    element: <ShareView />,
+  },
+  {
+    path: "v/:id",
+    element: <PlayerView />,
+  },
+  {
+    path: "*",
+    element: <ErrorView/>,
+  },
+]);
 
 const theme = createTheme({
   palette: {
@@ -24,8 +54,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
-      <ShotclockView />
+      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }

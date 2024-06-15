@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { customAlphabet } from "nanoid";
-import { Button, Stack, Typography } from "@mui/material";
-import { Pause, PlayArrow} from "@mui/icons-material";
+import { useEffect } from "react";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
+import { Pause, PlayArrow, Share} from "@mui/icons-material";
 import Grid from '@mui/material/Unstable_Grid2';
 import { IShotclock, Player } from "./lib/Shotclock";
 import Layout from "./Layout";
 import useSharedShotclock from "./useSharedShotclock";
+import { useNavigate, useParams } from "react-router-dom";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
@@ -20,11 +20,19 @@ const playAudio = async () => {
   } catch (e) {console.log(e)}
 };
 
-const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNPQRSTUVWXYZ", 5);
+function ShareButton() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  return (
+    <IconButton size="large" onClick={() => { navigate(`/s/${id}`); }}>
+      <Share />
+    </IconButton>
+  );
+}
 
 export default function ShotclockView() {
-  const id = useState(nanoid())[0];
-  const clock : IShotclock|undefined = useSharedShotclock(id);
+  const { id } = useParams();
+  const clock : IShotclock|undefined = useSharedShotclock(id!);
   const startStopIcon = clock?.isStarted() ? <Pause /> : <PlayArrow />;
 
   useEffect(() => {
@@ -35,7 +43,7 @@ export default function ShotclockView() {
 
   const toggleClock = () => { clock?.isStarted() ? clock?.pause() : clock?.start() };
   return (
-    <Layout>
+    <Layout toolbarItems={<ShareButton />}>
       <Stack height="100%" alignItems="center" justifyContent="center" spacing={2}>
         <Typography sx={timerStyles}>{clock?.getRemainingTime()}</Typography>
         <Grid container spacing={2}>
