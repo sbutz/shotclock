@@ -33,10 +33,14 @@ export class Shotclock implements IShotclock {
     private timer: Timer;
     private extensions: Set<Player>;
 
-    constructor(config: Config = defaultConfig) {
+    constructor(
+        config: Config = defaultConfig,
+        timer: Timer = new Timer(config.firstShotTime),
+        extensions: Set<Player> = new Set([Player.Guest, Player.Home])
+    ) {
         this.config = config;
-        this.timer = new Timer(this.config.firstShotTime);
-        this.extensions = new Set([Player.Guest, Player.Home]);
+        this.timer = timer;
+        this.extensions = extensions;
     }
 
     public newRack(): void {
@@ -81,5 +85,13 @@ export class Shotclock implements IShotclock {
         }
         this.extensions.delete(player);
         this.timer = new Timer(this.timer.getRemainingTime() + this.config.extensionTime);
+    }
+
+    public toObject() : any {
+        return {
+            config: this.config,
+            timer: this.timer.toObject(),
+            extensions: Array.from(this.extensions),
+        };
     }
 };

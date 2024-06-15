@@ -5,10 +5,10 @@ export class Timer {
     private startTime: number;
     private remainingTimeOnPause: number;
 
-    constructor(timeLimit: number) {
+    constructor(timeLimit: number, startTime: number = initialTime, remainingTimeOnPause: number = timeLimit) {
         this.timeLimit = timeLimit;
-        this.startTime = initialTime;
-        this.remainingTimeOnPause = timeLimit;
+        this.startTime = startTime;
+        this.remainingTimeOnPause = remainingTimeOnPause;
     }
 
     public reset(): void {
@@ -36,5 +36,13 @@ export class Timer {
             const elapsedTime = (Date.now() - this.startTime) / 1000;
             return Math.max(0, this.remainingTimeOnPause - elapsedTime);
         }
+    }
+
+    public toObject(): any {
+        return {
+            timeLimit: this.timeLimit,
+            startTime: this.startTime,
+            remainingTimeOnPause: this.remainingTimeOnPause,
+        };
     }
 };

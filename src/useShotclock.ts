@@ -25,6 +25,4 @@ export default function useShotclock() {
     useExtension: (player) => clock.useExtension(player),
   }
   return  ret;
-
-  //return { clock, remainingTime };
 }
