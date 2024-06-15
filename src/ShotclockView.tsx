@@ -1,10 +1,10 @@
+import { useEffect } from "react";
 import { Button, Stack, Typography } from "@mui/material";
-import { Player, Shotclock } from "./lib/Shotclock";
 import { Pause, PlayArrow} from "@mui/icons-material";
-import { useEffect, useState } from "react";
 import Grid from '@mui/material/Unstable_Grid2';
-
+import { IShotclock, Player } from "./lib/Shotclock";
 import Layout from "./Layout";
+import useShotclock from "./useShotclock";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
@@ -15,29 +15,20 @@ const timerStyles = {
 const audio = new Audio(process.env.PUBLIC_URL + "/shotclock.mp3");
 
 export default function ShotclockView() {
-  const clock = useState(new Shotclock())[0];
-  const [remainingTime, setRemainingTime] = useState(Math.round(clock.getRemainingTime()));
+  const clock : IShotclock = useShotclock();
   const startStopIcon = clock.isStarted() ? <Pause /> : <PlayArrow />;
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setRemainingTime(Math.round(clock.getRemainingTime()));
-    }, 250);
-
-    return () => clearInterval(intervalId);
-  }, [clock]);
-
-  useEffect(() => {
-    if (clock.isStarted() && remainingTime < 5) {
+    if (clock.isStarted() && clock.getRemainingTime() < 5) {
       audio.play();
     }
-  }, [remainingTime, clock]);
+  }, [clock]);
 
   const toggleClock = () => { clock.isStarted() ? clock.pause() : clock.start() };
   return (
     <Layout>
       <Stack height="100%" alignItems="center" justifyContent="center" spacing={2}>
-        <Typography sx={timerStyles}>{remainingTime}</Typography>
+        <Typography sx={timerStyles}>{clock.getRemainingTime()}</Typography>
         <Grid container spacing={2}>
           <Grid xs={12}>
             <Button variant="contained" startIcon={startStopIcon} onClick={toggleClock} fullWidth>

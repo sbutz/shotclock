@@ -5,6 +5,18 @@ export enum Player {
     Home = 'Home'
 }
 
+export interface IShotclock {
+    newRack(): void;
+    newShot(): void;
+    isStarted(): boolean;
+    start(): void;
+    pause(): void;
+    getRemainingTime(): number;
+    setRemainingTime(seconds: number): void;
+    hasExtension(player: Player): boolean;
+    useExtension(player: Player): void;
+}
+
 export interface Config {
     shotTime: number;
     extensionTime: number;
@@ -16,7 +28,7 @@ export const defaultConfig: Config = {
     firstShotTime: 60,
 };
 
-export class Shotclock {
+export class Shotclock implements IShotclock {
     private config: Config;
     private timer: Timer;
     private extensions: Set<Player>;
