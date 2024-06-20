@@ -1,3 +1,4 @@
+import { Config, defaultConfig } from "./ShotclockConfig";
 import { Timer } from "./Timer";
 
 export enum Player {
@@ -9,6 +10,7 @@ export interface IReadonlyShotclock {
     isStarted(): boolean;
     getRemainingTime(): number;
     hasExtension(player: Player): boolean;
+    getConfig(): Config;
 }
 
 export interface IShotclock extends IReadonlyShotclock {
@@ -18,18 +20,8 @@ export interface IShotclock extends IReadonlyShotclock {
     pause(): void;
     setRemainingTime(seconds: number): void;
     useExtension(player: Player): void;
+    setConfig(config: Config): void;
 }
-
-export interface Config {
-    shotTime: number;
-    extensionTime: number;
-    firstShotTime: number;
-}
-export const defaultConfig: Config = {
-    shotTime: 30,
-    extensionTime: 30,
-    firstShotTime: 60,
-};
 
 export class Shotclock implements IShotclock {
     private config: Config;
@@ -38,7 +30,7 @@ export class Shotclock implements IShotclock {
 
     constructor(
         config: Config = defaultConfig,
-        timer: Timer = new Timer(config.firstShotTime),
+        timer: Timer = new Timer(config.getFirstShotTime()),
         extensions: Set<Player> = new Set([Player.Guest, Player.Home])
     ) {
         this.config = config;
@@ -47,12 +39,12 @@ export class Shotclock implements IShotclock {
     }
 
     public newRack(): void {
-        this.timer = new Timer(this.config.firstShotTime);
+        this.timer = new Timer(this.config.getFirstShotTime());
         this.extensions = new Set([Player.Guest, Player.Home]);
     }
 
     public newShot(): void {
-        this.timer = new Timer(this.config.shotTime);
+        this.timer = new Timer(this.config.getShotTime());
     }
 
     public isStarted(): boolean {
@@ -87,12 +79,21 @@ export class Shotclock implements IShotclock {
             throw new Error('Player already used extension');
         }
         this.extensions.delete(player);
-        this.timer = new Timer(this.timer.getRemainingTime() + this.config.extensionTime);
+        this.timer = new Timer(this.timer.getRemainingTime() + this.config.getExtensionTime());
+    }
+
+    public getConfig(): Config {
+        return this.config;
+    }
+
+    public setConfig(config: Config): void {
+        this.config = config;
+        this.newRack();
     }
 
     public toObject() : any {
         return {
-            config: this.config,
+            config: this.config.toObject(),
             timer: this.timer.toObject(),
             extensions: Array.from(this.extensions),
         };

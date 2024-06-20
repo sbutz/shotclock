@@ -6,6 +6,7 @@ import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorView from './ErrorView';
 import ShareView from './ShareView';
 import PlayerView from './PlayerView';
+import SettingsView from './SettingsView';
 
 const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNPQRSTUVWXYZ", 5);
 
@@ -19,12 +20,16 @@ const router = createBrowserRouter([
     element: <ShotclockView />,
   },
   {
-    path: "s/:id",
+    path: ":id/share",
     element: <ShareView />,
   },
   {
-    path: "v/:id",
+    path: ":id/view",
     element: <PlayerView />,
+  },
+  {
+    path: ":id/settings",
+    element: <SettingsView />,
   },
   {
     path: "*",

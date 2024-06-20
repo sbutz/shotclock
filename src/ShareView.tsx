@@ -16,7 +16,7 @@ function CloseButton() {
 
 export default function ShareView() {
     const { id } = useParams();
-    const url = `${window.location.origin}${process.env.PUBLIC_URL}/v/${id}`;
+    const url = `${window.location.origin}${process.env.PUBLIC_URL}/${id}/view`;
 
     return (
         <Layout toolbarItems={<CloseButton />}>

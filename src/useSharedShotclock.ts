@@ -4,6 +4,7 @@ import { shotclockConverter } from "./lib/ShotclockConverter";
 import { IShotclock, Shotclock } from "./lib/Shotclock";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
 import { useCallback, useEffect, useState } from "react";
+import { Config, defaultConfig } from "./lib/ShotclockConfig";
 
 export default function useShardShotclock(id: string) {
     const ref = doc(db, `shotclocks/${id}`).withConverter(shotclockConverter);
@@ -11,6 +12,7 @@ export default function useShardShotclock(id: string) {
     const [shotclock, setShotclock] = useState<Shotclock|undefined>(value);
     const [remainingTime, setRemainingTime] = useState<number>(0);
     const [isStarted, setIsStarted] = useState<boolean>(false);
+    const [config, setConfig] = useState<Config>(defaultConfig);
 
     const updateFirestore = useCallback(async () => {
         console.debug("sync");
@@ -25,6 +27,14 @@ export default function useShardShotclock(id: string) {
         }
     };
 
+    const update = useCallback(() => {
+        if (shotclock) {
+            setIsStarted(shotclock.isStarted());
+            setRemainingTime(Math.round(shotclock.getRemainingTime()));
+            setConfig(shotclock.getConfig());
+        }
+    }, [shotclock]);
+
     useEffect(() => {
         if (!shotclock) {
             if (error) {
@@ -32,27 +42,24 @@ export default function useShardShotclock(id: string) {
             } else if (!loading && value) {
                 console.debug(`Loaded shotclock. Id=${id}`, value);
                 setShotclock(value);
+                update();
             } else if (!loading && !value) {
                 console.debug(`Created new shotclock. Id=${id}`);
                 const sc = new Shotclock();
                 setShotclock(sc);
+                update();
                 setDoc(ref, sc);
             }
         }
-    }, [shotclock, id, value, loading, error, ref]);
+    }, [shotclock, update, id, value, loading, error, ref]);
 
     useEffect(() => {
         if (shotclock) {
-            setRemainingTime(Math.round(shotclock.getRemainingTime()));
-            setIsStarted(shotclock.isStarted());
-            const intervalId = setInterval(() => {
-                setIsStarted(shotclock.isStarted());
-                setRemainingTime(Math.round(shotclock.getRemainingTime()));
-            }, 250);
-
+            update();
+            const intervalId = setInterval(update, 250);
             return () => clearInterval(intervalId);
         }
-    }, [shotclock]);
+    }, [update, shotclock]);
 
     if (shotclock) {
         const ret : IShotclock = {
@@ -65,6 +72,8 @@ export default function useShardShotclock(id: string) {
             setRemainingTime: withUpdateFirestore(shotclock, Shotclock.prototype.setRemainingTime),
             hasExtension: (player) => shotclock.hasExtension(player),
             useExtension: withUpdateFirestore(shotclock, Shotclock.prototype.useExtension),
+            getConfig: () => config,
+            setConfig: withUpdateFirestore(shotclock, Shotclock.prototype.setConfig),
         }
         return ret;
     }

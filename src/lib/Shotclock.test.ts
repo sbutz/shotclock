@@ -1,11 +1,12 @@
 import exp from "constants";
-import { Shotclock, defaultConfig, Player } from "./Shotclock";
+import { Shotclock, Player } from "./Shotclock";
+import { defaultConfig } from "./ShotclockConfig";
 
 jest.useFakeTimers();
 
 function isInitialState(shotclock: Shotclock): boolean {
     return shotclock.isStarted() === false
-        && shotclock.getRemainingTime() === defaultConfig.firstShotTime
+        && shotclock.getRemainingTime() === defaultConfig.getFirstShotTime()
         && shotclock.hasExtension(Player.Guest) === true
         && shotclock.hasExtension(Player.Home) === true;
 }
@@ -27,17 +28,17 @@ test('start/pause', () => {
     shotclock.start();
     jest.setSystemTime(now + 1000);
     expect(shotclock.isStarted()).toBe(true);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 1);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 1);
 
     shotclock.pause();
     jest.setSystemTime(now + 2000);
     expect(shotclock.isStarted()).toBe(false);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 1);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 1);
 
     shotclock.start();
     jest.setSystemTime(now + 3000);
     expect(shotclock.isStarted()).toBe(true);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 2);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 2);
 });
 
 test('new shot', () => {
@@ -45,7 +46,7 @@ test('new shot', () => {
 
     shotclock.newShot();
     expect(shotclock.isStarted()).toBe(false);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.shotTime);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getShotTime());
 });
 
 
@@ -57,11 +58,11 @@ test('new rack', () => {
     shotclock.start();
     jest.setSystemTime(now + 1000);
     expect(shotclock.isStarted()).toBe(true);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 1);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 1);
 
     shotclock.newRack();
     expect(shotclock.isStarted()).toBe(false);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime());
 });
 
 test('extensions', () => {
@@ -71,14 +72,14 @@ test('extensions', () => {
 
     // initial state
     shotclock.newShot();
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.shotTime);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getShotTime());
     expect(shotclock.hasExtension(Player.Guest)).toBe(true);
     expect(shotclock.hasExtension(Player.Home)).toBe(true);
 
     // guest take's extension
     shotclock.useExtension(Player.Guest);
     expect(shotclock.hasExtension(Player.Guest)).toBe(false);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.shotTime + defaultConfig.extensionTime);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getShotTime() + defaultConfig.getExtensionTime());
 
     // guest take's extension again
     expect(() => shotclock.useExtension(Player.Guest)).toThrowError('Player already used extension');
@@ -96,8 +97,8 @@ test('set remaining time', () => {
 
     shotclock.start();
     jest.setSystemTime(now + 2000);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 2);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 2);
 
     shotclock.setRemainingTime(shotclock.getRemainingTime() + 1);
-    expect(shotclock.getRemainingTime()).toBe(defaultConfig.firstShotTime - 1);
+    expect(shotclock.getRemainingTime()).toBe(defaultConfig.getFirstShotTime() - 1);
 });

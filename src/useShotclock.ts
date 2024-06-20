@@ -23,6 +23,8 @@ export default function useShotclock() {
     setRemainingTime: (seconds: number) => clock.setRemainingTime(seconds),
     hasExtension: (player) => clock.hasExtension(player),
     useExtension: (player) => clock.useExtension(player),
+    getConfig: () => clock.getConfig(),
+    setConfig: (config) => clock.setConfig(config),
   }
   return  ret;
 }

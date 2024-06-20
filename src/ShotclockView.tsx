@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button, IconButton, Stack, Typography } from "@mui/material";
-import { Pause, PlayArrow, Share} from "@mui/icons-material";
+import { Pause, PlayArrow, Settings, Share} from "@mui/icons-material";
 import Grid from '@mui/material/Unstable_Grid2';
 import { IShotclock, Player } from "./lib/Shotclock";
 import Layout from "./Layout";
@@ -24,9 +24,14 @@ function ShareButton() {
   const navigate = useNavigate();
   const { id } = useParams();
   return (
-    <IconButton size="large" onClick={() => { navigate(`/s/${id}`); }}>
-      <Share />
-    </IconButton>
+    <>
+      <IconButton size="large" onClick={() => { navigate(`/${id}/share`); }}>
+        <Share />
+      </IconButton>
+      <IconButton size="large" onClick={() => { navigate(`/${id}/settings`); }}>
+        <Settings />
+      </IconButton>
+    </>
   );
 }
 
