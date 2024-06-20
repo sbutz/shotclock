@@ -5,6 +5,7 @@ import { Navigate, useParams } from "react-router-dom";
 import useReadonlyShotclock from "./useReadonlyShotclock";
 import { IReadonlyShotclock, Player } from "./lib/Shotclock";
 import { useEffect } from "react";
+import { playSound } from "./Sounds";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
@@ -12,20 +13,13 @@ const timerStyles = {
   lineHeight: 1,
 }
 
-const audio = new Audio(process.env.PUBLIC_URL + "/shotclock.mp3");
-const playAudio = async () => {
-  try {
-    await audio.play();
-  } catch (e) {console.log(e)}
-};
-
 export default function PlayerView() {
     const { id } = useParams();
     const [clock, loading, error] = useReadonlyShotclock(id!) as [IReadonlyShotclock|undefined, boolean, Error];
 
     useEffect(() => {
-        if (clock?.isStarted() && clock?.getRemainingTime() < 5) {
-        playAudio();
+        if (clock?.isStarted()) {
+            playSound(clock.getRemainingTime());
         }
     }, [clock]);
 

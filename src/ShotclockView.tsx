@@ -6,19 +6,13 @@ import { IShotclock, Player } from "./lib/Shotclock";
 import Layout from "./Layout";
 import useSharedShotclock from "./useSharedShotclock";
 import { useNavigate, useParams } from "react-router-dom";
+import { playSound } from "./Sounds";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
   textAlign: "center",
   lineHeight: 1,
 }
-
-const audio = new Audio(process.env.PUBLIC_URL + "/shotclock.mp3");
-const playAudio = async () => {
-  try {
-    await audio.play();
-  } catch (e) {console.log(e)}
-};
 
 function ShareButton() {
   const navigate = useNavigate();
@@ -41,9 +35,9 @@ export default function ShotclockView() {
   const startStopIcon = clock?.isStarted() ? <Pause /> : <PlayArrow />;
 
   useEffect(() => {
-    if (clock?.isStarted() && clock?.getRemainingTime() < 5) {
-      playAudio();
-    }
+      if (clock?.isStarted()) {
+          playSound(clock.getRemainingTime());
+      }
   }, [clock]);
 
   const toggleClock = () => { clock?.isStarted() ? clock?.pause() : clock?.start() };
