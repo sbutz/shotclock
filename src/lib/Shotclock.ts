@@ -79,7 +79,11 @@ export class Shotclock implements IShotclock {
             throw new Error('Player already used extension');
         }
         this.extensions.delete(player);
+        const wasRunning = this.timer.isStarted();
         this.timer = new Timer(this.timer.getRemainingTime() + this.config.getExtensionTime());
+        if (wasRunning) {
+            this.timer.start();
+        }
     }
 
     public getConfig(): Config {
