@@ -7,6 +7,8 @@ import ErrorView from './ErrorView';
 import ShareView from './ShareView';
 import PlayerView from './PlayerView';
 import SettingsView from './SettingsView';
+import { useEffect } from 'react';
+import { Timer } from './lib/Timer';
 
 const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNPQRSTUVWXYZ", 5);
 
@@ -55,7 +57,23 @@ const theme = createTheme({
   },
 });
 
+function calculateServerTimeOffset() {
+  const localTime = Date.now();
+  fetch("butz.st")
+    .then(response => {
+      const dateString = response.headers.get("date") ||  Date();
+      const serverTime = Date.parse(dateString);
+      const offset = (serverTime - localTime) / 2 / 1000;
+      console.log(offset, serverTime, localTime);
+      Timer.setServerTimeOffset(offset);
+    });
+}
+
 function App() {
+  useEffect(() => {
+    calculateServerTimeOffset();
+  });
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
