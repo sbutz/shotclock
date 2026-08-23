@@ -56,7 +56,7 @@ export default function useShardShotclock(id: string) {
     useEffect(() => {
         if (shotclock) {
             update();
-            const intervalId = setInterval(update, 250);
+            const intervalId = setInterval(update, 100);
             return () => clearInterval(intervalId);
         }
     }, [update, shotclock]);

@@ -6,7 +6,7 @@ import { IShotclock, Player } from "./lib/Shotclock";
 import Layout from "./Layout";
 import useSharedShotclock from "./useSharedShotclock";
 import { useNavigate, useParams } from "react-router-dom";
-import { playSound } from "./Sounds";
+import { startBeep, stopBeep } from "./Sounds";
 
 const timerStyles = {
   fontSize: "min(60vw, 60vh)",
@@ -35,9 +35,17 @@ export default function ShotclockView() {
   const startStopIcon = clock?.isStarted() ? <Pause /> : <PlayArrow />;
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
       if (clock?.isStarted()) {
-          playSound(clock.getRemainingTime());
+        if (clock.getRemainingTime() === 5)
+          startBeep();
+        else if (clock.getRemainingTime() > 4)
+          stopBeep();
+      } else{
+        stopBeep();
       }
+    }, 100);
+    return () => clearInterval(intervalId);
   }, [clock]);
 
   const toggleClock = () => { clock?.isStarted() ? clock?.pause() : clock?.start() };

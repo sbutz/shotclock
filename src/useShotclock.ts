@@ -8,7 +8,7 @@ export default function useShotclock() {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setRemainingTime(Math.round(clock.getRemainingTime()));
-    }, 250);
+    }, 100);
 
     return () => clearInterval(intervalId);
   }, [clock]);

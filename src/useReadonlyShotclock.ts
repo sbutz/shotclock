@@ -27,7 +27,7 @@ export default function useShardShotclock(id: string) {
             const intervalId = setInterval(() => {
                 setIsStarted(shotclock.isStarted());
                 setRemainingTime(Math.round(shotclock.getRemainingTime()));
-            }, 250);
+            }, 100);
 
             return () => clearInterval(intervalId);
         }

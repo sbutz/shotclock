@@ -19,7 +19,7 @@ export default function PlayerView() {
 
     useEffect(() => {
         if (clock?.isStarted()) {
-            playSound(clock.getRemainingTime());
+            //playSound(clock.getRemainingTime());
         }
     }, [clock]);
 
