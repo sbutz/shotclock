@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "poolclock-5eb50"
+    "default": "poolclock-5eb50",
+    "staging": "poolclock-staging"
   }
 }

@@ -5,14 +5,22 @@ export function isDevelopmentEnv() {
   return process.env.NODE_ENV === 'development';
 }
 
+function getFirebaseEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required Firebase environment variable: ${name}`);
+  }
+  return value;
+}
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDJVleQTBlJ8_v-j76X6fPVSJUxoAvk4FA",
-  authDomain: "poolclock-5eb50.firebaseapp.com",
-  databaseURL: "https://poolclock-5eb50-default-rtdb.firebaseio.com",
-  projectId: "poolclock-5eb50",
-  storageBucket: "poolclock-5eb50.appspot.com",
-  messagingSenderId: "1044046655019",
-  appId: "1:1044046655019:web:fdc1802c87c0de5584c46e"
+  apiKey: getFirebaseEnvVar('REACT_APP_FIREBASE_API_KEY'),
+  authDomain: getFirebaseEnvVar('REACT_APP_FIREBASE_AUTH_DOMAIN'),
+  databaseURL: getFirebaseEnvVar('REACT_APP_FIREBASE_DATABASE_URL'),
+  projectId: getFirebaseEnvVar('REACT_APP_FIREBASE_PROJECT_ID'),
+  storageBucket: getFirebaseEnvVar('REACT_APP_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: getFirebaseEnvVar('REACT_APP_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: getFirebaseEnvVar('REACT_APP_FIREBASE_APP_ID')
 };
 
 const app = initializeApp(firebaseConfig);
