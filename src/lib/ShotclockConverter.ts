@@ -1,8 +1,9 @@
 import { Player, Shotclock } from "./Shotclock";
 import { Timer } from "./Timer";
 import { Config } from "./ShotclockConfig";
+import { serverTimestamp } from "firebase/database";
 
-const ttl = 1000 * 60 * 60 * 12; // 12 hours in milliseconds
+type ServerTimestampValue = ReturnType<typeof serverTimestamp>;
 
 type ShotclockData = {
   config: {
@@ -16,13 +17,13 @@ type ShotclockData = {
     remainingTimeOnPause?: number;
   };
   extensions: Player[];
-  expireAt: number;
+  expireAt: number | ServerTimestampValue;
 };
 
 export function toRealtimeShotclock(clock: Shotclock): ShotclockData {
   return {
     ...clock.toObject(),
-    expireAt: Date.now() + ttl,
+    expireAt: serverTimestamp(),
   };
 }
 

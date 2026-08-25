@@ -9,6 +9,8 @@ import PlayerView from './PlayerView';
 import SettingsView from './SettingsView';
 import { useEffect } from 'react';
 import { Timer } from './lib/Timer';
+import { onValue, ref } from 'firebase/database';
+import { db } from './Firebase';
 
 const nanoid = customAlphabet("123456789ABCDEFGHIJKLMNPQRSTUVWXYZ", 5);
 
@@ -57,22 +59,18 @@ const theme = createTheme({
   },
 });
 
-function calculateServerTimeOffset() {
-  const localTime = Date.now();
-  fetch("butz.st")
-    .then(response => {
-      const dateString = response.headers.get("date") ||  Date();
-      const serverTime = Date.parse(dateString);
-      const offset = (serverTime - localTime) / 2 / 1000;
-      console.log(offset, serverTime, localTime);
-      Timer.setServerTimeOffset(offset);
-    });
-}
-
 function App() {
   useEffect(() => {
-    calculateServerTimeOffset();
-  });
+    const offsetRef = ref(db, '.info/serverTimeOffset');
+    const unsubscribe = onValue(offsetRef, (snapshot) => {
+      const offset = snapshot.val();
+      if (typeof offset === 'number') {
+        Timer.setServerTimeOffset(offset);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

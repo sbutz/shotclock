@@ -4,7 +4,7 @@ export class Timer {
     private timeLimit: number;
     private startTime: number;
     private remainingTimeOnPause: number;
-    private static serverTimeOffset = 0;
+    private static serverTimeOffsetMs = 0;
 
     constructor(timeLimit: number, startTime: number = initialTime, remainingTimeOnPause: number = timeLimit) {
         this.timeLimit = timeLimit;
@@ -18,7 +18,7 @@ export class Timer {
     }
 
     public start(): void {
-        this.startTime = Date.now();
+        this.startTime = Timer.now();
     }
 
     public isStarted(): boolean {
@@ -34,7 +34,7 @@ export class Timer {
         if (this.startTime === initialTime) {
             return this.remainingTimeOnPause;
         } else {
-            const elapsedTime = (Date.now() + Timer.serverTimeOffset - this.startTime) / 1000;
+            const elapsedTime = (Timer.now() - this.startTime) / 1000;
             return Math.max(0, this.remainingTimeOnPause - elapsedTime);
         }
     }
@@ -47,7 +47,11 @@ export class Timer {
         };
     }
 
-    public static setServerTimeOffset(offset: number): void {
-        Timer.serverTimeOffset = offset;
+    public static now(): number {
+        return Date.now() + Timer.serverTimeOffsetMs;
+    }
+
+    public static setServerTimeOffset(offsetMs: number): void {
+        Timer.serverTimeOffsetMs = offsetMs;
     }
 };
