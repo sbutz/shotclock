@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "shotclocks": {
+      "$shotclock": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
